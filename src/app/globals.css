@@ -16,12 +16,27 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
+
+input {
+  color: black;
+}
+
+.movie-list {
+  margin-left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* optional: add some space between items */
+}
+
+
+
+
+/* body {
+  color: white;
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-}
+} */
