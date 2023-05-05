@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Credit from "../Interfaces/Credit";
 
+import missingImg from "../missing.jpg";
+
 interface MovieComponentProps {
   credit: Credit;
 }
@@ -12,7 +14,7 @@ export default function MovieComponent({ credit }: MovieComponentProps) {
         src={
           credit.backdrop_path
             ? `https://www.themoviedb.org/t/p/w150_and_h225_bestv2/${credit.backdrop_path}`
-            : ""
+            : missingImg
         }
         alt={
           credit.media_type === "movie"

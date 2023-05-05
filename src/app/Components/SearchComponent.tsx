@@ -1,9 +1,11 @@
 "use client";
 
-import React, {useState } from "react";
+import React, { useState } from "react";
 import Credit from "../Interfaces/Credit";
 import Result from "../Interfaces/Result";
 import MovieComponent from "./MovieComponent";
+
+
 
 export default function SearchComponent() {
   const [searchActor1, setsearchActor1] = useState("");
@@ -185,15 +187,13 @@ export default function SearchComponent() {
             (commonCredits.length > 0 ? (
               <div>
                 <div className="movie-list mt-4 justify-center">
-                  {commonCredits
-                    .filter((result) => result.backdrop_path)
-                    .map((result) => (
-                      <MovieComponent key={result.id} credit={result} />
-                    ))}
+                  {commonCredits.map((result) => (
+                    <MovieComponent key={result.id} credit={result} />
+                  ))}
                 </div>
               </div>
             ) : (
-              <p>No Movies</p>
+              <p className="text-center">No Movies</p>
             ))}
         </>
       )}
