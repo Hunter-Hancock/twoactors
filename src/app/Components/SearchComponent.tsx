@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import Credit from "../Interfaces/Credit";
 import Result from "../Interfaces/Result";
 import MovieComponent from "./MovieComponent";
