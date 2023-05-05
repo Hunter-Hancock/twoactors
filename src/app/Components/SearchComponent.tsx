@@ -5,8 +5,6 @@ import Credit from "../Interfaces/Credit";
 import Result from "../Interfaces/Result";
 import MovieComponent from "./MovieComponent";
 
-
-
 export default function SearchComponent() {
   const [searchActor1, setsearchActor1] = useState("");
   const [searchActor2, setsearchActor2] = useState("");
@@ -19,6 +17,16 @@ export default function SearchComponent() {
   const [credits2, setCredits2] = useState<Credit[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchPerformed, setSearchPerformed] = useState(false);
+
+  const uniqueResults = (results: any) => {
+    const uniqueNames = Array.from(
+      new Set(results.map((result: any) => result.name))
+    );
+    const uniqueResults = uniqueNames.map((name) =>
+      results.find((result: any) => result.name === name)
+    );
+    return uniqueResults;
+  };
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const searchBox = event.target.name;
@@ -35,10 +43,11 @@ export default function SearchComponent() {
       );
       const data = await response.json();
       if (data.results) {
+        const uniqueSuggestions = uniqueResults(data.results);
         if (searchBox === "actor1") {
-          setSuggestions1(data.results);
+          setSuggestions1(uniqueSuggestions);
         } else if (searchBox === "actor2") {
-          setSuggestions2(data.results);
+          setSuggestions2(uniqueSuggestions);
         }
       } else {
         if (searchBox === "actor1") {
