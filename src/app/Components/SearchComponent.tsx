@@ -141,23 +141,27 @@ export default function SearchComponent() {
   };
 
   // Find common credits excluding self credits
-  const commonCredits = credits1.filter(
-    (credit1) =>
-      credit1.character !== "" &&
-      credit1.character !== "Self" &&
-      credit1.character !== "Self (archive footage)" &&
-      credit1.character !== "Self - Host" &&
-      credit1.character !== "Self - Guest" &&
-      credits2.some(
-        (credit2) =>
-          credit2.character !== "" &&
-          credit2.character !== "Self" &&
-          credit2.character !== "Self (archive footage)" &&
-          credit2.character !== "Self - Host" &&
-          credit2.character !== "Self - Guest" &&
-          credit1.id === credit2.id
-      )
-  );
+  const commonCredits = credits1
+    .filter(
+      (credit1) =>
+        credit1.character !== "" &&
+        credit1.character !== "Self" &&
+        credit1.character !== "Self (archive footage)" &&
+        credit1.character !== "Self - Host" &&
+        credit1.character !== "Self - Guest" &&
+        credit1.character !== "Self (uncredited)" &&
+        credits2.some(
+          (credit2) =>
+            credit2.character !== "" &&
+            credit2.character !== "Self" &&
+            credit2.character !== "Self (archive footage)" &&
+            credit2.character !== "Self - Host" &&
+            credit2.character !== "Self - Guest" &&
+            credit2.character !== "Self (uncredited)" &&
+            credit1.id === credit2.id
+        )
+    )
+    .sort((a, b) => b.vote_count - a.vote_count);
 
   return (
     <div className="relative">
