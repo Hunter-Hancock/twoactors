@@ -1,7 +1,6 @@
 "use client";
 
 import SearchComponent from "@/components/SearchComponent";
-import "dotenv/config";
 import Image from "next/image";
 import { useState } from "react";
 import { Actor, Credit, Result } from "../types";
@@ -21,16 +20,9 @@ export default function Home() {
     let allCredits = [];
 
     for (const actor of actorResults) {
-      const url = `https://api.themoviedb.org/3/person/${actor.id}/combined_credits?language=en-US`;
-      const options = {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${process.env.API_KEY}`,
-        },
-      };
+      const url = `https://api.themoviedb.org/3/person/${actor.id}/combined_credits?language=en-US&api_key=${process.env.NEXT_PUBLIC_API_KEY}`;
 
-      const response = await fetch(url, options);
+      const response = await fetch(url);
       const data = await response.json();
 
       const sortedData = data.cast.sort(
@@ -73,16 +65,9 @@ export default function Home() {
       );
       setActorResults(newActorResults);
     } else {
-      const url = `https://api.themoviedb.org/3/search/person?query=${value}&include_adult=false&language=en-US&page=1`;
-      const options = {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${process.env.API_KEY}`,
-        },
-      };
+      const url = `https://api.themoviedb.org/3/search/person?query=${value}&include_adult=false&language=en-US&page=1&api_key=${process.env.NEXT_PUBLIC_API_KEY}`;
 
-      const response = await fetch(url, options);
+      const response = await fetch(url);
       const data = (await response.json()) as Result;
 
       setSearchActors(data.results);
