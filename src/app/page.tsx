@@ -26,7 +26,7 @@ export default function Home() {
         method: "GET",
         headers: {
           accept: "application/json",
-          Authorization: `Bearer ${process.env.BEARER_TOKEN}`,
+          Authorization: `Bearer ${process.env.API_KEY}`,
         },
       };
 
@@ -78,7 +78,7 @@ export default function Home() {
         method: "GET",
         headers: {
           accept: "application/json",
-          Authorization: `Bearer ${process.env.BEARER_TOKEN}`,
+          Authorization: `Bearer ${process.env.API_KEY}`,
         },
       };
 
