@@ -1,113 +1,172 @@
-import Image from 'next/image'
+"use client";
+
+import SearchComponent from "@/components/SearchComponent";
+import "dotenv/config";
+import Image from "next/image";
+import { useState } from "react";
+import { Actor, Credit, Result } from "../types";
 
 export default function Home() {
+  const [searchTerms, setSearchTerms] = useState<string[]>([]);
+  const [searchActors, setSearchActors] = useState<Actor[]>([]);
+  const [actorResults, setActorResults] = useState<Actor[]>([]);
+  const [creditResults, setCreditResults] = useState<Credit[]>([]);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [searched, setSearched] = useState<boolean>(false);
+
+  const handleSearch = async () => {
+    setSearched(false);
+    console.log("Searching for: ", searchTerms.join(", "));
+    setCreditResults([]);
+
+    let allCredits = [];
+
+    for (const actor of actorResults) {
+      const url = `https://api.themoviedb.org/3/person/${actor.id}/combined_credits?language=en-US`;
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${process.env.BEARER_TOKEN}`,
+        },
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      const sortedData = data.cast.sort(
+        (a: Credit, b: Credit) => b.vote_count - a.vote_count
+      );
+      allCredits.push(sortedData);
+
+      const commonCredits = allCredits.reduce((common, credits) => {
+        return common.filter((commonCredit: Credit) =>
+          credits.some((credit: Credit) => credit.id === commonCredit.id)
+        );
+      });
+
+      console.log(actorResults);
+      console.log(allCredits);
+
+      setCreditResults(commonCredits);
+      setSearched(true);
+    }
+  };
+
+  const handleClick = async (actor: Actor) => {
+    if (activeIndex !== null) {
+      await updateSearchTerms(activeIndex, actor.name);
+      setActorResults([...actorResults, actor]);
+      setSearchActors([]);
+    }
+  };
+
+  const handleFocus = (index: number) => {
+    setActiveIndex(index);
+  };
+
+  const updateSearchTerms = async (index: number, value: string) => {
+    const newSearchTerms = [...searchTerms];
+    newSearchTerms[index] = value;
+    setSearchTerms(newSearchTerms);
+
+    console.log(value);
+
+    if (value === "") {
+      // Remove the actor from actorResults if the search term is cleared
+      const newActorResults = actorResults.filter(
+        (_, actorIndex) => actorIndex !== index
+      );
+      setActorResults(newActorResults);
+    } else {
+      const url = `https://api.themoviedb.org/3/search/person?query=${value}&include_adult=false&language=en-US&page=1`;
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${process.env.BEARER_TOKEN}`,
+        },
+      };
+
+      const response = await fetch(url, options);
+      const data = (await response.json()) as Result;
+
+      setSearchActors(data.results);
+    }
+  };
+
+  const addSearchBox = () => {
+    setSearchTerms([...searchTerms, ""]);
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main className="flex min-h-screen flex-col items-center p-10">
+      <h1 className="text-xl">See if actors are in the same movie or show</h1>
+      <div className="flex flex-col space-y-5 items-center justify-center pt-5">
+        {searchTerms.map((term, index) => (
+          <SearchComponent
+            key={index}
+            label={`Actor ${index + 1}`}
+            onFocus={() => handleFocus(index)}
+            onChange={async (value) => await updateSearchTerms(index, value)}
+            value={searchTerms[index]}
+          />
+        ))}
+      </div>
+      {searchActors?.length > 0 && (
+        <div className="flex flex-col space-x-10 pt-5">
+          <ul>
+            {searchActors.map((actor, index) => (
+              <li
+                className="cursor-pointer text-xl"
+                key={index}
+                onClick={() => handleClick(actor)}>
+                <Image
+                  alt={actor.name}
+                  width={300}
+                  height={450}
+                  className="w-20 inline pr-5"
+                  src={
+                    actor.profile_path != null
+                      ? `https://www.themoviedb.org/t/p/w600_and_h900_bestv2/${actor.profile_path}`
+                      : "https://images.wondershare.com/repairit/aticle/2021/07/resolve-images-not-showing-problem-1.jpg"
+                  }
+                />
+                {actor.name}
+              </li>
+            ))}
+          </ul>
         </div>
+      )}
+      <div className="flex space-x-10 pt-5">
+        <button
+          className="rounded-sm bg-blue-500 px-4 py-2 font-bold"
+          onClick={addSearchBox}>
+          Add Actor
+        </button>
+        <button
+          className="rounded-sm bg-blue-500 px-4 py-2 font-bold"
+          onClick={handleSearch}>
+          Search
+        </button>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      {searched && creditResults.length > 0 && (
+        <div className="flex flex-wrap space-x-5 text-center text-xl justify-center pt-5 text-clip overflow-hidden">
+          {creditResults.map((credit, index) => (
+            <div className="flex flex-col space-y-5 py-5" key={index}>
+              <Image
+                width={300}
+                height={450}
+                alt={
+                  credit.title ? credit.title : credit.name ? credit.name : ""
+                }
+                src={`https://www.themoviedb.org/t/p/w1280/${credit.poster_path}`}
+              />
+              <h1>{credit.title ? credit.title : credit.name}</h1>
+            </div>
+          ))}
+        </div>
+      )}
     </main>
-  )
+  );
 }
