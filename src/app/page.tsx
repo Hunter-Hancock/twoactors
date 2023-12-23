@@ -16,7 +16,6 @@ export default function Home() {
 
   const handleSearch = async () => {
     setSearched(false);
-    console.log("Searching for: ", searchTerms.join(", "));
     setCreditResults([]);
 
     let allCredits = [];
@@ -45,9 +44,6 @@ export default function Home() {
         );
       });
 
-      console.log(actorResults);
-      console.log(allCredits);
-
       setCreditResults(commonCredits);
       setSearched(true);
     }
@@ -69,8 +65,6 @@ export default function Home() {
     const newSearchTerms = [...searchTerms];
     newSearchTerms[index] = value;
     setSearchTerms(newSearchTerms);
-
-    console.log(value);
 
     if (value === "") {
       // Remove the actor from actorResults if the search term is cleared
@@ -114,11 +108,15 @@ export default function Home() {
         ))}
       </div>
       {searchActors?.length > 0 && (
-        <div className="flex flex-col space-x-10 pt-5">
+        <div className="flex flex-col space-x-10 py-3 px-2 border border-white">
           <ul>
             {searchActors.map((actor, index) => (
               <li
-                className="cursor-pointer text-xl"
+                className={`cursor-pointer text-xl ${
+                  index < searchActors.length - 1
+                    ? "border-b border-gray-300"
+                    : ""
+                }`}
                 key={index}
                 onClick={() => handleClick(actor)}>
                 <Image
