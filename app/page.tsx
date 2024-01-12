@@ -1,8 +1,9 @@
 "use client";
 
-import SearchComponent from "@/components/SearchComponent";
 import Image from "next/image";
 import { useState } from "react";
+import { ModeToggle } from "../components/ModeToggle";
+import SearchComponent from "../components/SearchComponent";
 import { Actor, Credit, Result } from "../types";
 
 export default function Home() {
