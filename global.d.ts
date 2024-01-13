@@ -15,9 +15,17 @@ declare type Credit = {
   media_type: string;
 };
 
-declare type Result = {
-  page: number;
-  results: Actor[];
-  total_pages: number;
-  total_results: number;
-};
+declare type Result =
+  | undefined
+  | [
+      {
+        cast: Credit[];
+      }
+    ];
+
+// declare type Result = {
+//   page: number;
+//   results: Actor[];
+//   total_pages: number;
+//   total_results: number;
+// };

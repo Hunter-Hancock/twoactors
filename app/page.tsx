@@ -9,14 +9,7 @@ import { search } from "./actions";
 
 export default function NewPage() {
   const [actors, setActors] = useState<Actor[]>([]);
-  const [results, setResults] = useState<
-    | undefined
-    | [
-        {
-          cast: Credit[];
-        }
-      ]
-  >(undefined);
+  const [results, setResults] = useState<Result>(undefined);
 
   const [input, setInput] = useState<string>("");
 
@@ -63,12 +56,14 @@ export default function NewPage() {
         <Button onClick={test}>Search</Button>
       </div>
 
-      <Suspense
-        fallback={
-          <div className="w-10 h-10 border-2 border-red-600 animate-spin mt-2 border-t-transparent rounded-full"></div>
-        }>
-        <Suggestions onClick={handleClick} search={input} />
-      </Suspense>
+      {input.length > 0 && (
+        <Suspense
+          fallback={
+            <div className="w-10 h-10 border-2 border-red-600 animate-spin mt-2 border-t-transparent rounded-full"></div>
+          }>
+          <Suggestions onClick={handleClick} search={input} />
+        </Suspense>
+      )}
 
       {results && results.length > 0 && (
         <Suspense
