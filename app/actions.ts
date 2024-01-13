@@ -8,8 +8,6 @@ export async function search(actors: { id: number; name: string }[]) {
     const data = await response.json();
 
     juice.push(data);
-
-    console.log(data);
   }
 
   return juice;
