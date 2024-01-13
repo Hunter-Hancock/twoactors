@@ -48,7 +48,9 @@ export default function NewPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
-        <Button onClick={test}>Search</Button>
+        <Button disabled={actors.length < 1} onClick={test}>
+          Search
+        </Button>
       </div>
 
       {input.length > 0 && (

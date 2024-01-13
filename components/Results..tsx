@@ -23,7 +23,7 @@ export default async function Results({
   });
 
   return (
-    <div className="flex flex-row flex-wrap gap-10 text-center text-xl justify-center pt-5 text-clip overflow-hidden">
+    <div className="flex flex-row flex-wrap gap-10 text-center text-xl justify-center pt-5 text-clip">
       {commonCredits.filter(
         (c, i) =>
           !c.genre_ids.includes(10763) &&
@@ -44,7 +44,7 @@ export default async function Results({
           .map((result, index) => (
             <Link
               href={`https://www.themoviedb.org/${result.media_type}/${result.id}`}
-              className="flex flex-col max-w-72 border-2 cursor-pointer rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 ease-in-out"
+              className="flex flex-col max-w-80 border-2 cursor-pointer rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 ease-in-out"
               key={index}>
               <img
                 className="w-[300px] h-[450px] rounded-md"
