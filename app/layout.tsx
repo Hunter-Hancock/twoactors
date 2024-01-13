@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Header from "../components/Header";
 import { ModeToggle } from "../components/ModeToggle";
 import { ThemeProvider } from "../components/theme-provider";
 import "./globals.css";
@@ -24,9 +25,7 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange>
-          <div className="flex justify-end mx-10 my-5">
-            <ModeToggle />
-          </div>
+          <Header />
           {children}
         </ThemeProvider>
       </body>

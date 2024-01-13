@@ -1,155 +1,81 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
-import { ModeToggle } from "../components/ModeToggle";
-import SearchComponent from "../components/SearchComponent";
-import { Actor, Credit, Result } from "../types";
+import { Button } from "@/components/ui/button";
+import { Suspense, useState } from "react";
+import Results from "../components/Results.";
+import Suggestions from "../components/Suggestions";
+import { search } from "./actions";
 
-export default function Home() {
-  const [searchTerms, setSearchTerms] = useState<string[]>([]);
-  const [searchActors, setSearchActors] = useState<Actor[]>([]);
-  const [actorResults, setActorResults] = useState<Actor[]>([]);
-  const [creditResults, setCreditResults] = useState<Credit[]>([]);
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [searched, setSearched] = useState<boolean>(false);
+export default function NewPage() {
+  const [actors, setActors] = useState<Actor[]>([]);
+  const [results, setResults] = useState<
+    | undefined
+    | [
+        {
+          cast: Credit[];
+        }
+      ]
+  >(undefined);
 
-  const handleSearch = async () => {
-    setSearched(false);
-    setCreditResults([]);
+  const [input, setInput] = useState<string>("");
 
-    let allCredits = [];
-
-    for (const actor of actorResults) {
-      const url = `https://api.themoviedb.org/3/person/${actor.id}/combined_credits?language=en-US&api_key=${process.env.NEXT_PUBLIC_API_KEY}`;
-
-      const response = await fetch(url);
-      const data = await response.json();
-
-      const sortedData = data.cast.sort(
-        (a: Credit, b: Credit) => b.vote_count - a.vote_count
-      );
-      allCredits.push(sortedData);
-
-      const commonCredits = allCredits.reduce((common, credits) => {
-        return common.filter((commonCredit: Credit) =>
-          credits.some((credit: Credit) => credit.id === commonCredit.id)
-        );
-      });
-
-      setCreditResults(commonCredits);
-      setSearched(true);
-    }
+  const handleClick = (actor: Actor) => {
+    if (actors.includes(actor)) return;
+    setActors([...actors, actor]);
+    setInput("");
   };
 
-  const handleClick = async (actor: Actor) => {
-    if (activeIndex !== null) {
-      await updateSearchTerms(activeIndex, actor.name);
-      setActorResults([...actorResults, actor]);
-      setSearchActors([]);
-    }
-  };
+  const test = async () => {
+    const data = (await search(actors)) as [
+      {
+        cast: Credit[];
+      }
+    ];
 
-  const handleFocus = (index: number) => {
-    setActiveIndex(index);
-  };
-
-  const updateSearchTerms = async (index: number, value: string) => {
-    const newSearchTerms = [...searchTerms];
-    newSearchTerms[index] = value;
-    setSearchTerms(newSearchTerms);
-
-    if (value === "") {
-      // Remove the actor from actorResults if the search term is cleared
-      const newActorResults = actorResults.filter(
-        (_, actorIndex) => actorIndex !== index
-      );
-      setActorResults(newActorResults);
-    } else {
-      const url = `https://api.themoviedb.org/3/search/person?query=${value}&include_adult=false&language=en-US&page=1&api_key=${process.env.NEXT_PUBLIC_API_KEY}`;
-
-      const response = await fetch(url);
-      const data = (await response.json()) as Result;
-
-      setSearchActors(data.results);
-    }
-  };
-
-  const addSearchBox = () => {
-    setSearchTerms([...searchTerms, ""]);
+    setResults(data);
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-10">
-      <h1 className="text-xl">See if actors are in the same movie or show</h1>
-      <div className="flex flex-col space-y-5 items-center justify-center pt-5">
-        {searchTerms.map((term, index) => (
-          <SearchComponent
-            key={index}
-            label={`Actor ${index + 1}`}
-            onFocus={() => handleFocus(index)}
-            onChange={async (value) => await updateSearchTerms(index, value)}
-            value={searchTerms[index]}
-          />
+    <main className="flex flex-col items-center">
+      <div className="flex flex-row mb-2 gap-2">
+        {actors.map((actor, index) => (
+          <h1
+            key={actor.id}
+            onClick={() => {
+              setActors(actors.filter((_, i) => i !== index));
+              setResults([{ cast: [] }]);
+            }}
+            className="w-36 h-5 text-sm border text-center rounded-full border-neutral-500 cursor-pointer hover:bg-red-500">
+            {actor.name}
+          </h1>
         ))}
       </div>
-      {searchActors?.length > 0 && (
-        <div className="flex flex-col space-x-10 py-3 px-2 border border-white">
-          <ul>
-            {searchActors.map((actor, index) => (
-              <li
-                className={`cursor-pointer text-xl ${
-                  index < searchActors.length - 1
-                    ? "border-b border-gray-300"
-                    : ""
-                }`}
-                key={index}
-                onClick={() => handleClick(actor)}>
-                <Image
-                  alt={actor.name}
-                  width={300}
-                  height={450}
-                  className="w-20 inline pr-5"
-                  src={
-                    actor.profile_path != null
-                      ? `https://www.themoviedb.org/t/p/w600_and_h900_bestv2/${actor.profile_path}`
-                      : "https://images.wondershare.com/repairit/aticle/2021/07/resolve-images-not-showing-problem-1.jpg"
-                  }
-                />
-                {actor.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <div className="flex space-x-10 pt-5">
-        <button
-          className="rounded-sm bg-blue-500 px-4 py-2 font-bold"
-          onClick={addSearchBox}>
-          Add Actor
-        </button>
-        <button
-          className="rounded-sm bg-blue-500 px-4 py-2 font-bold"
-          onClick={handleSearch}>
-          Search
-        </button>
+
+      <div className="flex gap-2 mb-2">
+        <input
+          className="border border-neutral-500 px-2 py-1"
+          type="text"
+          placeholder="Search for an actor..."
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <Button onClick={test}>Search</Button>
       </div>
-      {searched && creditResults.length > 0 && (
-        <div className="flex flex-wrap space-x-5 text-center text-xl justify-center pt-5 text-clip overflow-hidden">
-          {creditResults.map((credit, index) => (
-            <div className="flex flex-col space-y-5 py-5" key={index}>
-              <Image
-                width={300}
-                height={450}
-                alt={
-                  credit.title ? credit.title : credit.name ? credit.name : ""
-                }
-                src={`https://www.themoviedb.org/t/p/w1280/${credit.poster_path}`}
-              />
-              <h1>{credit.title ? credit.title : credit.name}</h1>
-            </div>
-          ))}
-        </div>
+
+      <Suspense
+        fallback={
+          <div className="w-10 h-10 border-2 border-red-600 animate-spin mt-2 border-t-transparent rounded-full"></div>
+        }>
+        <Suggestions onClick={handleClick} search={input} />
+      </Suspense>
+
+      {results && results.length > 0 && (
+        <Suspense
+          fallback={
+            <div className="w-10 h-10 border-2 border-indigo-600 animate-spin mt-2 border-t-transparent rounded-full"></div>
+          }>
+          <Results results={results} />
+        </Suspense>
       )}
     </main>
   );
