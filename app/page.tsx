@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Suspense, useState } from "react";
 import Results from "../components/Results.";
 import Suggestions from "../components/Suggestions";
@@ -52,7 +53,7 @@ export default function NewPage() {
       </div>
 
       <div className="flex gap-2 mb-2">
-        <input
+        <Input
           className="border border-neutral-500 px-2 py-1"
           type="text"
           placeholder="Search for an actor..."
