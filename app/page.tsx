@@ -20,12 +20,7 @@ export default function NewPage() {
   };
 
   const test = async () => {
-    const data = (await search(actors)) as [
-      {
-        cast: Credit[];
-      }
-    ];
-
+    const data = (await search(actors)) as Result;
     setResults(data);
   };
 
