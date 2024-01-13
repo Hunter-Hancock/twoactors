@@ -2,16 +2,14 @@ import Link from "next/link";
 
 export default async function Results({
   results,
+  actors,
 }: {
-  results: [
-    {
-      cast: Credit[];
-    }
-  ];
+  results: Result;
+  actors: Actor[];
 }) {
   let allCredits = [];
 
-  for (const result of results) {
+  for (const result of results!) {
     const sortedData = result.cast.sort(
       (a: Credit, b: Credit) => b.vote_count - a.vote_count
     );
@@ -32,7 +30,7 @@ export default async function Results({
           !c.genre_ids.includes(10767) &&
           c.genre_ids.length > 0 &&
           c.poster_path != null
-      ).length === 0 ? (
+      ).length === 0 && actors.length > 0 ? (
         <h1 className="text-2xl">Nothing In Common</h1>
       ) : (
         commonCredits

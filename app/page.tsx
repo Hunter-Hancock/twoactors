@@ -70,7 +70,7 @@ export default function NewPage() {
           fallback={
             <div className="w-10 h-10 border-2 border-indigo-600 animate-spin mt-2 border-t-transparent rounded-full"></div>
           }>
-          <Results results={results} />
+          <Results actors={actors} results={results} />
         </Suspense>
       )}
     </main>

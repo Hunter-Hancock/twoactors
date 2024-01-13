@@ -11,9 +11,7 @@ export default async function Suggestions({
 
   const data = await response.json();
 
-  const results = data.results as Actor[];
-
-  results.splice(5, results.length - 5);
+  const results = (data.results as Actor[]).slice(0, 5);
 
   return (
     <div className="flex flex-col w-72 gap-2">
