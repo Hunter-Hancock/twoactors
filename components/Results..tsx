@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default async function Results({
@@ -23,7 +24,7 @@ export default async function Results({
   });
 
   return (
-    <div className="flex flex-row flex-wrap gap-10 text-center text-xl justify-center pt-5 text-clip">
+    <div className="flex flex-row flex-wrap gap-x-20 gap-y-10 text-center text-xl justify-center pt-5 text-clip">
       {commonCredits.filter(
         (c, i) =>
           !c.genre_ids.includes(10763) &&
@@ -46,9 +47,13 @@ export default async function Results({
               href={`https://www.themoviedb.org/${result.media_type}/${result.id}`}
               className="flex flex-col max-w-80 border-2 cursor-pointer rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 ease-in-out"
               key={index}>
-              <img
-                className="w-[300px] h-[450px] rounded-md"
+              <Image
+                alt={`${result.title} poster`}
+                width={300}
+                height={450}
+                className="w-full rounded-md"
                 src={`https://www.themoviedb.org/t/p/w1280/${result.poster_path}`}
+                unoptimized
               />
               <h1 className="my-5 px-2">
                 {result.title ? result.title : result.name}

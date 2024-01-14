@@ -1,4 +1,4 @@
-export async function search(actors: { id: number; name: string }[]) {
+export async function search(actors: Actor[]) {
   const juice = [];
 
   for (const actor of actors) {
