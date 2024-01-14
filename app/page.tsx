@@ -2,19 +2,64 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Suspense, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Results from "../components/Results.";
 import Suggestions from "../components/Suggestions";
 import { search } from "./actions";
 
-export default function NewPage() {
+export default function NewPage({
+  searchParams,
+}: {
+  searchParams: {
+    search?: string;
+    name?: string;
+  };
+}) {
   const [actors, setActors] = useState<Actor[]>([]);
   const [results, setResults] = useState<Result>(undefined);
 
   const [input, setInput] = useState<string>("");
 
+  const pathname = usePathname();
+
+  const createQueryString = useCallback((name: string, values: Actor[]) => {
+    const params = new URLSearchParams(searchParams);
+
+    values.forEach((value) => {
+      params.append(name, value.id.toString());
+      params.append("name", value.name);
+    });
+
+    return params.toString();
+  }, []);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!searchParams.search) return;
+
+    const actors = Array.isArray(searchParams.search)
+      ? searchParams.search.map((id) => ({
+          id: parseInt(id),
+          name: searchParams.name,
+        }))
+      : [
+          {
+            id: parseInt(searchParams.search),
+            name: searchParams.name,
+          },
+        ];
+
+    setActors(actors as unknown as Actor[]);
+
+    search(actors as unknown as Actor[]).then((data) => {
+      setResults(data as unknown as Result);
+    }) as unknown as Result;
+  }, [searchParams.search]);
+
   const handleClick = (actor: Actor) => {
-    if (actors.includes(actor)) return;
+    if (actors.some((a) => a.id === actor.id)) return;
     setActors([...actors, actor]);
     setInput("");
   };
@@ -22,6 +67,8 @@ export default function NewPage() {
   const test = async () => {
     const data = (await search(actors)) as Result;
     setResults(data);
+
+    router.push(pathname + "?" + createQueryString("search", actors));
   };
 
   return (
