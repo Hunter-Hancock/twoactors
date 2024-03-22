@@ -43,22 +43,28 @@ export default async function Results({
               c.poster_path != null
           )
           .map((result, index) => (
-            <Link
-              href={`https://www.themoviedb.org/${result.media_type}/${result.id}`}
-              className="flex flex-col max-w-80 border-2 cursor-pointer rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 ease-in-out"
-              key={index}>
-              <Image
-                alt={`${result.title} poster`}
-                width={300}
-                height={450}
-                className="w-full rounded-md"
-                src={`https://www.themoviedb.org/t/p/w1280/${result.poster_path}`}
-                unoptimized
-              />
-              <h1 className="my-5 px-2">
-                {result.title ? result.title : result.name}
-              </h1>
-            </Link>
+            <div className="relative group">
+              <Link
+                href={`https://www.themoviedb.org/${result.media_type}/${result.id}`}
+                className="flex flex-col relative group max-w-80 border-2 cursor-pointer rounded-md shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 ease-in-out"
+                key={index}>
+                <Image
+                  alt={`${result.title} poster`}
+                  width={300}
+                  height={450}
+                  className="w-full rounded-md"
+                  src={`https://www.themoviedb.org/t/p/w1280/${result.poster_path}`}
+                  unoptimized
+                />
+                <h1 className="my-5 px-2">
+                  {result.title ? result.title : result.name}
+                </h1>
+              </Link>
+              <div className="md:absolute md:top-0 md:left-full md:ml-4 md:w-64 md:opacity-0 md:group-hover:opacity-100 md:p-4 md:rounded-md z-10 md:bg-gray-600">
+                <p>{result.title ? result.title : result.name}</p>
+                <p>{result.overview}</p>
+              </div>
+            </div>
           ))
       )}
     </div>

@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import { Suspense, useState } from "react";
 import Results from "../components/Results.";
 import Suggestions from "../components/Suggestions";
@@ -28,15 +29,22 @@ export default function NewPage() {
     <main className="flex flex-col items-center min-h-screen">
       <div className="flex mb-2 gap-2">
         {actors.map((actor, index) => (
-          <h1
-            key={actor.id}
-            onClick={() => {
-              setActors(actors.filter((_, i) => i !== index));
-              setResults(undefined);
-            }}
-            className="w-36 flex items-center justify-center text-sm border text-center rounded-full border-neutral-500 cursor-pointer hover:bg-red-500">
-            {actor.name}
-          </h1>
+          <div className="flex border border-neutral-500 rounded-full">
+            <Link
+              href={`/actor/${actor.id}`}
+              key={actor.id}
+              className="w-36 flex items-center justify-center text-sm text-center hover:bg-green-400 rounded-l-full">
+              {actor.name}
+            </Link>
+            <button
+              onClick={() => {
+                setActors(actors.filter((_, i) => i !== index));
+                setResults(undefined);
+              }}
+              className="w-10 rounded-r-full text-sm hover:bg-red-500">
+              X
+            </button>
+          </div>
         ))}
       </div>
       <div className="md:w-[800px] flex gap-2 mb-2">

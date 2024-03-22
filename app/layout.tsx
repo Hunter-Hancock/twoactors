@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Footer from "../components/Footer";
 import Header from "../components/Header";
-import { ModeToggle } from "../components/ModeToggle";
 import { ThemeProvider } from "../components/theme-provider";
 import "./globals.css";
 
@@ -27,6 +27,7 @@ export default function RootLayout({
           disableTransitionOnChange>
           <Header />
           {children}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
